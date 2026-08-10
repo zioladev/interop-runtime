@@ -1,0 +1,45 @@
+name: Publish
+
+# Publishes @zioladev/provider-conformance to npm on a GitHub Release, or a dry-run on demand.
+#
+# First publish uses NODE_AUTH_TOKEN (repo secret NPM_TOKEN) — an npm automation / granular
+# token with publish rights to @zioladev. After the first version exists, switch to npm Trusted
+# Publishing (OIDC) on the package settings (same path as @zioladev/provider-tools) and drop the
+# token. See RELEASE-CHECKLIST.md.
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Dry run (build + pack, do NOT publish)"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+  id-token: write # required for provenance
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          registry-url: https://registry.npmjs.org
+      - run: npm ci || npm install
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - name: Publish (or dry-run)
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.dry_run }}" = "true" ]; then
+            npm publish --dry-run --access public
+          else
+            npm publish --access public --provenance
+          fi
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

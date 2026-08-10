@@ -1,0 +1,11 @@
+@zioladev/provider-conformance
+Copyright 2026 Ziola
+
+This product is licensed under the Apache License, Version 2.0 (the "License");
+you may not use this software except in compliance with the License. A copy of
+the License is provided in the LICENSE file and is also available at
+http://www.apache.org/licenses/LICENSE-2.0
+
+This package is a clean-room implementation. It contains no code, types,
+generated artifacts, or fixtures from any proprietary source, and requires none
+to build, test, or execute.

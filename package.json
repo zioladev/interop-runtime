@@ -1,0 +1,59 @@
+{
+  "name": "@zioladev/interop-runtime",
+  "version": "0.1.0",
+  "description": "Measure multi-step WebMCP interoperability: run one frozen trajectory across providers and models, carry lineage-bearing state between steps, and attribute any failure to the layer that caused it — model, orchestration, provider, or runtime.",
+  "keywords": [
+    "webmcp",
+    "interoperability",
+    "trajectory",
+    "multi-provider",
+    "cross-model",
+    "model-context",
+    "agent",
+    "attribution",
+    "carried-state"
+  ],
+  "license": "Apache-2.0",
+  "author": "Ziola",
+  "homepage": "https://github.com/zioladev/interop-runtime#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zioladev/interop-runtime.git"
+  },
+  "bugs": {
+    "url": "https://github.com/zioladev/interop-runtime/issues"
+  },
+  "type": "module",
+  "types": "./dist/index.d.ts",
+  "main": "./dist/index.js",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "NOTICE",
+    "README.md"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=22.6"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "node --experimental-strip-types --test tests/*.test.ts"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.0"
+  },
+  "dependencies": {},
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  }
+}

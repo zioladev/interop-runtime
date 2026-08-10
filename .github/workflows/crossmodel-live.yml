@@ -1,0 +1,55 @@
+name: 3C cross-model live acceptance
+
+# The Phase III / 3C LIVE gate — real Claude + GPT + Gemini each traverse the SAME frozen
+# multi-provider trajectory, entirely from the cloud (workflow_dispatch). Runs whichever families
+# have a key (ANTHROPIC_API_KEY / OPENAI_API_KEY / GEMINI_API_KEY). This copy lives at the package
+# root so it works once @zioladev/provider-conformance is its own repo. Each model's raw response
+# AT EVERY STEP is preserved in the uploaded evidence bundle. Keys are masked.
+
+on:
+  workflow_dispatch:
+    inputs:
+      anthropic_model:
+        description: "Anthropic model id (ignored if no ANTHROPIC_API_KEY)"
+        type: string
+        default: "claude-haiku-4-5-20251001"
+      openai_model:
+        description: "OpenAI model id (ignored if no OPENAI_API_KEY)"
+        type: string
+        default: "gpt-4o-mini"
+      gemini_model:
+        description: "Gemini model id (a heavier tier traverses the multi-step hop more reliably)"
+        type: string
+        default: "gemini-2.5-pro"
+
+permissions:
+  contents: read
+
+jobs:
+  crossmodel-live:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+      - run: npm ci || npm install
+      - name: Run the 3C cross-model live acceptance
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          ANTHROPIC_MODEL: ${{ inputs.anthropic_model }}
+          OPENAI_MODEL: ${{ inputs.openai_model }}
+          GEMINI_MODEL: ${{ inputs.gemini_model }}
+        run: node --experimental-strip-types scripts/crossmodel-live.ts | tee crossmodel-live.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: crossmodel-live-log
+          path: crossmodel-live.txt
+      - name: Upload the evidence bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: crossmodel-evidence
+          path: crossmodel-bundle/
+          if-no-files-found: ignore

@@ -1,9 +1,11 @@
 # interop-runtime — specification
 
-`@zioladev/interop-runtime` measures multi-step, multi-provider WebMCP **trajectories** and
-attributes any failure to the layer that caused it. It builds on the single-decision measurement
-language of `@zioladev/provider-conformance` (Phase II) but is an independent package — see
-[`../DUPLICATION-LEDGER.md`](../DUPLICATION-LEDGER.md).
+`@zioladev/interop-runtime` is a model-agnostic runtime for executing ordered, multi-step,
+multi-provider WebMCP **trajectories** — carrying authoritative state across providers with
+provenance and judging completion by explicit terminal requirements — and it emits structured
+evidence that attributes any failure to the layer that caused it. It builds on the single-decision
+measurement language of `@zioladev/provider-conformance` (Phase II) but is an independent package —
+see [`../DUPLICATION-LEDGER.md`](../DUPLICATION-LEDGER.md).
 
 ## The documents
 

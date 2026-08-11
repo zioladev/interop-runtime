@@ -1,11 +1,11 @@
 name: Publish
 
-# Publishes @zioladev/provider-conformance to npm on a GitHub Release, or a dry-run on demand.
+# Publishes @zioladev/interop-runtime to npm on a GitHub Release, or a dry-run on demand.
 #
 # First publish uses NODE_AUTH_TOKEN (repo secret NPM_TOKEN) — an npm automation / granular
 # token with publish rights to @zioladev. After the first version exists, switch to npm Trusted
 # Publishing (OIDC) on the package settings (same path as @zioladev/provider-tools) and drop the
-# token. See RELEASE-CHECKLIST.md.
+# token.
 
 on:
   release:

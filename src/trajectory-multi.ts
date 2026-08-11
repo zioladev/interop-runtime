@@ -66,8 +66,17 @@ export interface PlannedStep {
   dependsOn?: string[];
   /** Outputs this leg publishes into carried state, lifted from its execution evidence (`data[fromField]`). */
   publishes?: { key: string; fromField: string }[];
-  /** Whether this leg must end in a successful STATE-CHANGING execution for the journey to be complete. */
+  /** Whether this leg must end in a successful STATE-CHANGING execution. Orthogonal to
+   *  `requiredForTerminal`: `commitRequired` is about the EFFECT (a state change must happen);
+   *  it does not by itself assert the step is part of the terminal objective (though in practice a
+   *  required commit usually is — mark it `requiredForTerminal` too when it is). */
   commitRequired?: boolean;
+  /** Whether SUCCESSFUL ATTAINMENT of this leg is part of the frozen terminal predicate — i.e. the
+   *  journey's objective is unmet until this step completes, regardless of whether it mutates state.
+   *  This is orthogonal to `commitRequired` (D43): a non-mutating final verification/analysis (e.g. a
+   *  read that must run to complete the errand) is `requiredForTerminal: true, commitRequired: false`;
+   *  an optional exploratory read is neither. "Finishing the commits ≠ finishing the journey." */
+  requiredForTerminal?: boolean;
 }
 
 export interface MultiProviderTrajectorySpec {
@@ -317,7 +326,8 @@ export interface MultiProviderTrajectoryDerived {
   trajectoryConformance: Verdict;
   providerNonconformance: boolean;
   providerGrade: Verdict;
-  /** Whether every commit-required leg actually committed — the frozen terminal predicate (D37). */
+  /** The frozen terminal predicate (D37/D43): every commit-required leg committed AND every
+   *  required-for-terminal (possibly non-mutating) leg was successfully attained. */
   terminalAttained: boolean;
   /** The executed route across providers, for the record. */
   routeKey: string;
@@ -331,6 +341,12 @@ function didCommit(r: MultiStepRecord): boolean {
 /** True iff this leg carries a step-level fault that already owns its non-execution. */
 function hasStepFault(d: PathDerived): boolean {
   return d.attribution.length > 0;
+}
+
+/** A non-commit leg is ATTAINED iff it successfully executed a tool with no step-level fault — the
+ *  attainment notion for a `requiredForTerminal` step that (correctly) mutates nothing (D43). */
+function didAttainNonCommit(r: MultiStepRecord): boolean {
+  return r.executed && !hasStepFault(r.derived);
 }
 
 /**
@@ -420,13 +436,41 @@ export function evaluateMultiProviderTrajectory(
           }
         }
       }
+
+      // D) Required-for-terminal, NON-commit leg (D43): a mandatory non-mutating step (e.g. a final
+      //    verification/analysis) that must SUCCESSFULLY execute for the journey's objective to be
+      //    met. Commit legs are handled in (C); this covers the orthogonal case where nothing is
+      //    mutated but the errand is still incomplete without it. Same owner-first attribution.
+      if (s.requiredForTerminal && !s.commitRequired) {
+        if (didAttainNonCommit(r)) {
+          orchOk(s.stepId, 'required_terminal_step', `${s.stepId} completed its required (non-mutating) step`);
+        } else {
+          const how = r.executed ? 'executed with a fault' : (r.decision.type === 'clarification' || r.decision.type === 'no_action' ? 'declined (asked / narrated instead of executing)' : 'did not execute');
+          invariantResults.push({ stepId: s.stepId, kind: 'terminal_not_attained', held: false, detail: `${s.stepId} is required for terminal completion but ${how} — completing the commits is not completing the journey` });
+          const ownedByStep = hasStepFault(r.derived) || browserFaults.length > 0;
+          const ownedByMissingInput = orchestration.some((o) => o.signal === 'missing_carried_input' && o.detail.includes(s.stepId));
+          if (!ownedByStep && !ownedByMissingInput) {
+            modelDeclineFaults.push({ category: 'model_tool_selection', verdict: 'FAIL', signal: 'trajectory_requirement_unmet', detail: `${s.stepId} was required for terminal completion, but the model ${how}` });
+          }
+        }
+      }
     }
   }
 
-  const terminalAttained = spec.steps.filter((s) => s.commitRequired).every((s) => {
+  // The frozen terminal predicate (D37/D43): every commit-required leg actually committed AND every
+  // required-for-terminal leg was successfully attained. The two clauses are orthogonal — a required
+  // non-mutating leg (commitRequired:false, requiredForTerminal:true) must still be attained; an
+  // optional read (neither) never blocks terminal. With no requiredForTerminal steps the second
+  // clause is vacuously true, so pre-D43 specs behave identically.
+  const commitsDone = spec.steps.filter((s) => s.commitRequired).every((s) => {
     const r = byId.get(s.stepId);
     return r !== undefined && didCommit(r);
   });
+  const requiredReadsDone = spec.steps.filter((s) => s.requiredForTerminal && !s.commitRequired).every((s) => {
+    const r = byId.get(s.stepId);
+    return r !== undefined && didAttainNonCommit(r);
+  });
+  const terminalAttained = commitsDone && requiredReadsDone;
 
   // Owner-first aggregation: model-layer faults (step-level + declined-commit) → orchestration
   // (runtime/state/sequencing) → provider fault → browser (lane).

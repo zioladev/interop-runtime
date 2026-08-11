@@ -1,9 +1,10 @@
 {
   "name": "@zioladev/interop-runtime",
   "version": "0.1.0",
-  "description": "Measure multi-step WebMCP interoperability: run one frozen trajectory across providers and models, carry lineage-bearing state between steps, and attribute any failure to the layer that caused it — model, orchestration, provider, or runtime.",
+  "description": "A model-agnostic runtime for executing stateful, multi-step trajectories across independent WebMCP providers — lineage-bearing carried state, explicit terminal requirements, and evidence attributing any failure to model, orchestration, provider, or runtime.",
   "keywords": [
     "webmcp",
+    "runtime",
     "interoperability",
     "trajectory",
     "multi-provider",

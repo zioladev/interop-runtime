@@ -109,3 +109,17 @@ export type { MultiProviderReportInput, MultiProviderTrajectoryReport } from './
 // --- Cross-model (3C): do Claude/GPT/Gemini reach the same allowable terminal state? ---
 export { runCrossModelTrajectory, compareCrossModelTrajectory, renderCrossModelArtifact } from './trajectory-crossmodel.ts';
 export type { CrossModelTrajectoryResult, CrossModelPerModel, CrossModelComparison } from './trajectory-crossmodel.ts';
+
+// --- The Chrome/WebMCP acceptance lane: a SurfaceResolver over a privileged browser host ---
+// interop-runtime is the brain; the host (e.g. the Refraktor extension) is the arms and legs.
+export { CHROME_WEBMCP_RUNTIME_ID, makeBrowserSurfaceResolver } from './browser-host.ts';
+export type { BrowserHost } from './browser-host.ts';
+
+// --- The FROZEN 3C acceptance fixture (shipped canonical) — the exact spec + provider defs every
+// gate (reference, cross-model live, Chrome/WebMCP) drives byte-identically. See acceptance-fixture.ts. ---
+export {
+  CAFE_PROVIDER,
+  BAKERY_PROVIDER,
+  CROSSMODEL_JOURNEY_SPEC,
+  CROSSMODEL_PROVIDER_DEFS,
+} from './acceptance-fixture.ts';

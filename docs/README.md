@@ -13,6 +13,7 @@ language of `@zioladev/provider-conformance` (Phase II) but is an independent pa
 | 15 | [trajectories](./15-phase-iii-trajectories.md) | 3A — measuring a **trajectory**, not a single decision. The `trajectory_orchestration` owner; report `/2`. |
 | 16 | [multiprovider](./16-phase-iii-3b-multiprovider.md) | 3B — **multi-provider** trajectories; provenance-bearing carried state; *model memory ≠ authoritative state*; *loop ≠ completion*. |
 | 17 | [crossmodel](./17-phase-iii-3c-crossmodel.md) | 3C — **cross-model** comparison; *different path ≠ failure*; compare on observed execution, not narration; the cloud-only live acceptance gate. |
+| 18 | [chrome-acceptance](./18-chrome-acceptance.md) | The final Phase III gate — real Chrome/WebMCP via a `BrowserHost` port. **Refraktor as browser host/transport; interop-runtime as the brain.** No legacy orchestration. |
 
 ## Status
 

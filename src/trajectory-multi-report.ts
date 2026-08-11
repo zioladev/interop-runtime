@@ -21,6 +21,8 @@ export interface MultiProviderTrajectoryReport {
   reportGenerator: string;
   reportGeneratorVersion: string;
   generatedAt: string;
+  /** The runtime lane this trajectory was measured on (e.g. `reference-runtime/1`, `chrome-webmcp`). */
+  lane: { runtimeId: string; browserVersion: string | null };
   trajectories: Array<{
     caseId: string;
     trajectoryId: string;
@@ -89,6 +91,7 @@ export function assembleMultiProviderTrajectoryReport(input: MultiProviderReport
     reportGenerator: REPORT_GENERATOR,
     reportGeneratorVersion: REPORT_GENERATOR_VERSION,
     generatedAt: input.generatedAt ?? new Date().toISOString(),
+    lane: { runtimeId: input.runtimeId, browserVersion: input.browserVersion },
     trajectories,
     summary: { provider: providerGrade, byLayer, notes },
   };

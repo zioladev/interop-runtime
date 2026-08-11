@@ -1,6 +1,6 @@
 # @zioladev/interop-runtime
 
-**Run stateful objectives across independent WebMCP providers.**
+**Run stateful multi-provider WebMCP journeys.**
 
 `@zioladev/interop-runtime` is a model-agnostic runtime for executing **ordered, multi-step
 trajectories** across independent provider surfaces. It carries authoritative outputs from one step

@@ -1,0 +1,608 @@
+{
+  "reportVersion": "provider-conformance-report/2",
+  "reportGeneratorVersion": "0.1.0",
+  "runtimeId": "reference-runtime/1",
+  "trajectoryId": "order-then-pastry/3c-live",
+  "comparison": {
+    "trajectoryId": "order-then-pastry/3c-live",
+    "byModel": {
+      "anthropic-claude": {
+        "modelId": "claude-haiku-4-5-20251001",
+        "route": "cafe/commit:place_order -> bakery/commit:add_pastry",
+        "terminalAttained": true,
+        "trajectoryConformance": "PASS",
+        "providerGrade": "PASS",
+        "firstOwner": "none"
+      },
+      "openai-gpt": {
+        "modelId": "gpt-4o-mini",
+        "route": "cafe/commit:place_order -> bakery/commit:add_pastry",
+        "terminalAttained": true,
+        "trajectoryConformance": "PASS",
+        "providerGrade": "PASS",
+        "firstOwner": "none"
+      },
+      "google-gemini": {
+        "modelId": "gemini-2.5-pro",
+        "route": "cafe/commit:place_order -> bakery/commit:add_pastry",
+        "terminalAttained": true,
+        "trajectoryConformance": "PASS",
+        "providerGrade": "PASS",
+        "firstOwner": "none"
+      }
+    },
+    "pathDifference": false,
+    "terminalStateDifference": false,
+    "trajectoryConformanceDifference": false,
+    "provider": "PASS",
+    "converged": true
+  },
+  "models": [
+    {
+      "adapterId": "anthropic-claude",
+      "adapterVersion": "1.0.0",
+      "modelId": "claude-haiku-4-5-20251001",
+      "derived": {
+        "terminalAttained": true,
+        "trajectoryConformance": "PASS",
+        "providerGrade": "PASS",
+        "routeKey": "cafe/commit:place_order -> bakery/commit:add_pastry",
+        "attribution": [],
+        "invariantResults": [
+          {
+            "stepId": "s1",
+            "kind": "required_commit",
+            "held": true,
+            "detail": "s1 performed its required commit"
+          },
+          {
+            "stepId": "s2",
+            "kind": "carried_input_used",
+            "held": true,
+            "detail": "s2.orderId carried \"orderId\" forward from cafe/place_order"
+          },
+          {
+            "stepId": "s2",
+            "kind": "required_commit",
+            "held": true,
+            "detail": "s2 performed its required commit"
+          }
+        ]
+      },
+      "carried": [
+        {
+          "key": "orderId",
+          "value": "CAFE-ORDER",
+          "producedBy": {
+            "stepId": "s1",
+            "providerId": "cafe",
+            "toolName": "place_order"
+          },
+          "evidenceRef": "s1"
+        }
+      ],
+      "steps": [
+        {
+          "index": 0,
+          "stepId": "s1",
+          "providerId": "cafe",
+          "intent": "place_order",
+          "transition": {
+            "toProviderId": "cafe",
+            "surfaceReady": true
+          },
+          "decision": {
+            "type": "tool_call",
+            "toolName": "place_order",
+            "arguments": {
+              "item": "latte",
+              "size": "M"
+            }
+          },
+          "executed": true,
+          "firedTool": "place_order",
+          "firedEffect": "state-changing",
+          "published": [
+            {
+              "key": "orderId",
+              "value": "CAFE-ORDER",
+              "producedBy": {
+                "stepId": "s1",
+                "providerId": "cafe",
+                "toolName": "place_order"
+              },
+              "evidenceRef": "s1"
+            }
+          ],
+          "outcome": "executed",
+          "firstOwner": "none",
+          "raw": {
+            "model": "claude-haiku-4-5-20251001",
+            "id": "msg_011Cduq6nLdbBWyW9Bnx639u",
+            "type": "message",
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "I'll help you with this errand, but I need to let you know about a limitation: I only have access to tools for the cafe (lookup_drink and place_order), but I don't have an add_pastry function available for the bakery.\n\nLet me start with the cafe and place the latte order:"
+              },
+              {
+                "type": "tool_use",
+                "id": "toolu_01VuGuE4uQBzm14LHA8j4zUb",
+                "name": "place_order",
+                "input": {
+                  "item": "latte",
+                  "size": "M"
+                },
+                "caller": {
+                  "type": "direct"
+                }
+              }
+            ],
+            "stop_reason": "tool_use",
+            "stop_sequence": null,
+            "stop_details": null,
+            "usage": {
+              "input_tokens": 739,
+              "cache_creation_input_tokens": 0,
+              "cache_read_input_tokens": 0,
+              "cache_creation": {
+                "ephemeral_5m_input_tokens": 0,
+                "ephemeral_1h_input_tokens": 0
+              },
+              "output_tokens": 141,
+              "service_tier": "standard",
+              "inference_geo": "not_available"
+            }
+          }
+        },
+        {
+          "index": 1,
+          "stepId": "s2",
+          "providerId": "bakery",
+          "intent": "add_pastry",
+          "transition": {
+            "fromProviderId": "cafe",
+            "toProviderId": "bakery",
+            "surfaceReady": true
+          },
+          "decision": {
+            "type": "tool_call",
+            "toolName": "add_pastry",
+            "arguments": {
+              "orderId": "CAFE-ORDER",
+              "pastry": "croissant"
+            }
+          },
+          "executed": true,
+          "firedTool": "add_pastry",
+          "firedEffect": "state-changing",
+          "published": [],
+          "outcome": "executed",
+          "firstOwner": "none",
+          "raw": {
+            "model": "claude-haiku-4-5-20251001",
+            "id": "msg_011Cduq6uy28iAbznnsuUpKK",
+            "type": "message",
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "Great! I've placed the cafe order for a medium latte with orderId **\"CAFE-ORDER\"**.\n\nNow let me add a croissant to that same order at the bakery:"
+              },
+              {
+                "type": "tool_use",
+                "id": "toolu_01G3b9QcmhXpvfqpoEvPSqQy",
+                "name": "add_pastry",
+                "input": {
+                  "orderId": "CAFE-ORDER",
+                  "pastry": "croissant"
+                },
+                "caller": {
+                  "type": "direct"
+                }
+              }
+            ],
+            "stop_reason": "tool_use",
+            "stop_sequence": null,
+            "stop_details": null,
+            "usage": {
+              "input_tokens": 874,
+              "cache_creation_input_tokens": 0,
+              "cache_read_input_tokens": 0,
+              "cache_creation": {
+                "ephemeral_5m_input_tokens": 0,
+                "ephemeral_1h_input_tokens": 0
+              },
+              "output_tokens": 121,
+              "service_tier": "standard",
+              "inference_geo": "not_available"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "adapterId": "openai-gpt",
+      "adapterVersion": "1.0.0",
+      "modelId": "gpt-4o-mini",
+      "derived": {
+        "terminalAttained": true,
+        "trajectoryConformance": "PASS",
+        "providerGrade": "PASS",
+        "routeKey": "cafe/commit:place_order -> bakery/commit:add_pastry",
+        "attribution": [],
+        "invariantResults": [
+          {
+            "stepId": "s1",
+            "kind": "required_commit",
+            "held": true,
+            "detail": "s1 performed its required commit"
+          },
+          {
+            "stepId": "s2",
+            "kind": "carried_input_used",
+            "held": true,
+            "detail": "s2.orderId carried \"orderId\" forward from cafe/place_order"
+          },
+          {
+            "stepId": "s2",
+            "kind": "required_commit",
+            "held": true,
+            "detail": "s2 performed its required commit"
+          }
+        ]
+      },
+      "carried": [
+        {
+          "key": "orderId",
+          "value": "CAFE-ORDER",
+          "producedBy": {
+            "stepId": "s1",
+            "providerId": "cafe",
+            "toolName": "place_order"
+          },
+          "evidenceRef": "s1"
+        }
+      ],
+      "steps": [
+        {
+          "index": 0,
+          "stepId": "s1",
+          "providerId": "cafe",
+          "intent": "place_order",
+          "transition": {
+            "toProviderId": "cafe",
+            "surfaceReady": true
+          },
+          "decision": {
+            "type": "tool_call",
+            "toolName": "place_order",
+            "arguments": {
+              "item": "latte",
+              "size": "M"
+            }
+          },
+          "executed": true,
+          "firedTool": "place_order",
+          "firedEffect": "state-changing",
+          "published": [
+            {
+              "key": "orderId",
+              "value": "CAFE-ORDER",
+              "producedBy": {
+                "stepId": "s1",
+                "providerId": "cafe",
+                "toolName": "place_order"
+              },
+              "evidenceRef": "s1"
+            }
+          ],
+          "outcome": "executed",
+          "firstOwner": "none",
+          "raw": {
+            "id": "chatcmpl-EBSSD07Xg8VL7x4qmy8yCAF4XDHjt",
+            "object": "chat.completion",
+            "created": 1786399693,
+            "model": "gpt-4o-mini-2024-07-18",
+            "choices": [
+              {
+                "index": 0,
+                "message": {
+                  "role": "assistant",
+                  "content": null,
+                  "tool_calls": [
+                    {
+                      "id": "call_UikoFfkDOliRiBe92SSguich",
+                      "type": "function",
+                      "function": {
+                        "name": "place_order",
+                        "arguments": "{\"item\":\"latte\",\"size\":\"M\"}"
+                      }
+                    }
+                  ],
+                  "refusal": null,
+                  "annotations": []
+                },
+                "logprobs": null,
+                "finish_reason": "tool_calls"
+              }
+            ],
+            "usage": {
+              "prompt_tokens": 160,
+              "completion_tokens": 19,
+              "total_tokens": 179,
+              "prompt_tokens_details": {
+                "cached_tokens": 0,
+                "audio_tokens": 0
+              },
+              "completion_tokens_details": {
+                "reasoning_tokens": 0,
+                "audio_tokens": 0,
+                "accepted_prediction_tokens": 0,
+                "rejected_prediction_tokens": 0
+              }
+            },
+            "service_tier": "default",
+            "system_fingerprint": "fp_9709ac0e8b"
+          }
+        },
+        {
+          "index": 1,
+          "stepId": "s2",
+          "providerId": "bakery",
+          "intent": "add_pastry",
+          "transition": {
+            "fromProviderId": "cafe",
+            "toProviderId": "bakery",
+            "surfaceReady": true
+          },
+          "decision": {
+            "type": "tool_call",
+            "toolName": "add_pastry",
+            "arguments": {
+              "orderId": "CAFE-ORDER",
+              "pastry": "croissant"
+            }
+          },
+          "executed": true,
+          "firedTool": "add_pastry",
+          "firedEffect": "state-changing",
+          "published": [],
+          "outcome": "executed",
+          "firstOwner": "none",
+          "raw": {
+            "id": "chatcmpl-EBSSEhGkCbW90MJcX9XKljRgDqsTt",
+            "object": "chat.completion",
+            "created": 1786399694,
+            "model": "gpt-4o-mini-2024-07-18",
+            "choices": [
+              {
+                "index": 0,
+                "message": {
+                  "role": "assistant",
+                  "content": null,
+                  "tool_calls": [
+                    {
+                      "id": "call_7dge8RsKdJooWWf25UQ11PrR",
+                      "type": "function",
+                      "function": {
+                        "name": "add_pastry",
+                        "arguments": "{\"orderId\":\"CAFE-ORDER\",\"pastry\":\"croissant\"}"
+                      }
+                    }
+                  ],
+                  "refusal": null,
+                  "annotations": []
+                },
+                "logprobs": null,
+                "finish_reason": "tool_calls"
+              }
+            ],
+            "usage": {
+              "prompt_tokens": 238,
+              "completion_tokens": 25,
+              "total_tokens": 263,
+              "prompt_tokens_details": {
+                "cached_tokens": 0,
+                "audio_tokens": 0
+              },
+              "completion_tokens_details": {
+                "reasoning_tokens": 0,
+                "audio_tokens": 0,
+                "accepted_prediction_tokens": 0,
+                "rejected_prediction_tokens": 0
+              }
+            },
+            "service_tier": "default",
+            "system_fingerprint": "fp_72f05258df"
+          }
+        }
+      ]
+    },
+    {
+      "adapterId": "google-gemini",
+      "adapterVersion": "1.0.0",
+      "modelId": "gemini-2.5-pro",
+      "derived": {
+        "terminalAttained": true,
+        "trajectoryConformance": "PASS",
+        "providerGrade": "PASS",
+        "routeKey": "cafe/commit:place_order -> bakery/commit:add_pastry",
+        "attribution": [],
+        "invariantResults": [
+          {
+            "stepId": "s1",
+            "kind": "required_commit",
+            "held": true,
+            "detail": "s1 performed its required commit"
+          },
+          {
+            "stepId": "s2",
+            "kind": "carried_input_used",
+            "held": true,
+            "detail": "s2.orderId carried \"orderId\" forward from cafe/place_order"
+          },
+          {
+            "stepId": "s2",
+            "kind": "required_commit",
+            "held": true,
+            "detail": "s2 performed its required commit"
+          }
+        ]
+      },
+      "carried": [
+        {
+          "key": "orderId",
+          "value": "CAFE-ORDER",
+          "producedBy": {
+            "stepId": "s1",
+            "providerId": "cafe",
+            "toolName": "place_order"
+          },
+          "evidenceRef": "s1"
+        }
+      ],
+      "steps": [
+        {
+          "index": 0,
+          "stepId": "s1",
+          "providerId": "cafe",
+          "intent": "place_order",
+          "transition": {
+            "toProviderId": "cafe",
+            "surfaceReady": true
+          },
+          "decision": {
+            "type": "tool_call",
+            "toolName": "place_order",
+            "arguments": {
+              "size": "M",
+              "item": "latte"
+            }
+          },
+          "executed": true,
+          "firedTool": "place_order",
+          "firedEffect": "state-changing",
+          "published": [
+            {
+              "key": "orderId",
+              "value": "CAFE-ORDER",
+              "producedBy": {
+                "stepId": "s1",
+                "providerId": "cafe",
+                "toolName": "place_order"
+              },
+              "evidenceRef": "s1"
+            }
+          ],
+          "outcome": "executed",
+          "firstOwner": "none",
+          "raw": {
+            "candidates": [
+              {
+                "content": {
+                  "parts": [
+                    {
+                      "functionCall": {
+                        "name": "place_order",
+                        "args": {
+                          "size": "M",
+                          "item": "latte"
+                        }
+                      },
+                      "thoughtSignature": "Cu0FARFNMg+a19V6k/B9vV4EOTOtTO6Hs5EzQMD2aW030unR/SLnNa6cyHGJpRTelaos7ZE2TWlcftd3yZ/eI+iQb7GqPJpK+vKsr+AqVfIMusLm+rmjoPI16SqDrkuCZX6yVajz0qQqnaIukvo5P0P1+ALXjPzOE+m7tcywAmYptatBk3TF/Ol6mU4jRZbaf0T5vClzjFYUkP3A7YEmLILGNrYaDTz/fV3ixZFecsizg7oC9W6TJndS1cC3TvwHCzp6tAxg2PuWCtFeSFpHqWCG+E1+i2dHs2pJrDZMptPIMQNrH8BuY+XN/sbG8/LGL5gQpj4r27ZCiD1Y46EqZt5rYbyXGyflSeJ/BpzRKVBVs1QjaZ8vGqBrUeal1IF1UKUc6pjBvFFdF3fFxX9Bdf+T6T/lY7hjKsiw9rtKIGuQoDMqzXYlz1LSWfNLa+T268zCdw3lN1W3WhjsbW/nJedkYD+/Il2D4YBoEMwUyBTDbt9bNeX9rLMWfUr9/uTr6c2WBgRDg35jlwvuAxBCl99bDC8sx3LFe9GvORaktq8OEnC5Lk9nl8yE/0vr6pvsQF9BOikHJoc5o7uKAaJsI5mS1e3WpdWNC6wuT9WRe+o8caEIpzVOeix7wC/XWOTrgr+D6g1q+/CuauKXhtqFA1DhtmsIC/Ja9Qe3M6IcEV6Gm8rSL1u+wp1jw9L6M3Rbavl6M8bm1Pq5bsFDsCkWG0n9htLjcjvEuAJR2xirpiJaOyvMBPUxzd+YS+Zbu7h0Mx1AzABTdSV0A9krqripaXsbtwdGiy+mii2hwJ70qsnxiCPLq7Lnm9uqc8sas4Bhg9/ESi3HC4SiRLMUL9L7Xv1kS97LPfp5pjwHJxjLLJsYFdpBfoCDTZW/jI84yKfVaYKzULGNPtQm+XXeQqPI63i7c1ECOr81l6wWZkWU1fRlsNfNkoXdFXe2ZvxbzjndVrRgjbsApuJf+p6ph9SHQfZ2Qdg3ng8ORlGKX4JgXFA="
+                    }
+                  ],
+                  "role": "model"
+                },
+                "finishReason": "STOP",
+                "index": 0,
+                "finishMessage": "Model generated function call(s)."
+              }
+            ],
+            "usageMetadata": {
+              "promptTokenCount": 178,
+              "candidatesTokenCount": 21,
+              "totalTokenCount": 374,
+              "promptTokensDetails": [
+                {
+                  "modality": "TEXT",
+                  "tokenCount": 178
+                }
+              ],
+              "thoughtsTokenCount": 175,
+              "serviceTier": "standard"
+            },
+            "modelVersion": "gemini-2.5-pro",
+            "responseId": "z0t6aoKOHOaMjrEP4-3ggAY"
+          }
+        },
+        {
+          "index": 1,
+          "stepId": "s2",
+          "providerId": "bakery",
+          "intent": "add_pastry",
+          "transition": {
+            "fromProviderId": "cafe",
+            "toProviderId": "bakery",
+            "surfaceReady": true
+          },
+          "decision": {
+            "type": "tool_call",
+            "toolName": "add_pastry",
+            "arguments": {
+              "pastry": "croissant",
+              "orderId": "CAFE-ORDER"
+            }
+          },
+          "executed": true,
+          "firedTool": "add_pastry",
+          "firedEffect": "state-changing",
+          "published": [],
+          "outcome": "executed",
+          "firstOwner": "none",
+          "raw": {
+            "candidates": [
+              {
+                "content": {
+                  "parts": [
+                    {
+                      "functionCall": {
+                        "name": "add_pastry",
+                        "args": {
+                          "pastry": "croissant",
+                          "orderId": "CAFE-ORDER"
+                        }
+                      },
+                      "thoughtSignature": "CtAFARFNMg/KfBh+ZZwzE7AKy8q3E0nrEeS8DytM6VaZm5y5jNLHICznjinc2RIyfdcKmPp3vTyyb0J/z/XW1Ut7NsdvByE4+N0PqBheSX05E0erJE0ls8pbi+gAVXm/FjYWLT+RskM5LkHyveM1wVFhJcPr8b5EO5pbBKNqVkE8vmy7713wrhbGMjV91Q43w7C/72CSXpw4PsH689G/yX9JPDGpIK1hK9jfvpLeDvXEckgZhZM9wqFRx0xqmjBWXyHi/sAHlP+Sk8/V3f/Bs64eYG/XOxTxcWCnJoBEAf2wU+gnnTT2jvevZl4hNXO9n/lB+wWQEewCs3lDuO8iv48C2x/dL22f6Cup7bEiWGeNljscNgmkFaaLOBpi/dxZA4WXttGdCafmK0b4EaF2pGsnhTHNIlsGVUOQpaziCR0CAyPhO29UW0kQ3TUehniGxOmpfhH3tm+dRhsPkpoEymwI8CbT+ydQ/4dHCqOjK3YHJewWgvG0fRLxKSQOCjPCi70rqW958BleW+tQVsoUDZ1T76X10X0ohvMmCnTLSly6WUoGKVLgXf/o4eI3T+xTlWPXYBVu55nfbgRynclZTV/T9k5fF4sFQhjR9sSANZpn1L83QXd7y0nwYpsb5l5V+dQp36bsQkvTa0HsuN4CGdYFYARnv6UwKkBTTEjHBeQj731rii5LH11XV1BBLD9iJz2DWb1PUBOGTGwkGuWrZU5lfzFqevhbXhRmkor9PpyondGGR1vkLm3GZ5DRjmMq1GgTZztSZHqxYP1xS+Q4lDks6if1iS8Ux6mGvipg3ldcgSb7AbpSaP4CEE22bJT/UDGQBm1ts3sVputzfNB/EnKmvhtDoNF57gs9UTZwrb1Ae08mkmP7ipBqs9ItilnKjBP/XK1hzJslINjhY7YzbfX2gX0ItLLVM9twfuCPAUDsWWcRdhsyLuhUn+TRZ9iWjLKT"
+                    }
+                  ],
+                  "role": "model"
+                },
+                "finishReason": "STOP",
+                "index": 0,
+                "finishMessage": "Model generated function call(s)."
+              }
+            ],
+            "usageMetadata": {
+              "promptTokenCount": 273,
+              "candidatesTokenCount": 26,
+              "totalTokenCount": 485,
+              "promptTokensDetails": [
+                {
+                  "modality": "TEXT",
+                  "tokenCount": 273
+                }
+              ],
+              "thoughtsTokenCount": 186,
+              "serviceTier": "standard"
+            },
+            "modelVersion": "gemini-2.5-pro",
+            "responseId": "0Ut6aqTSMLuc-8YP5J6AqQQ"
+          }
+        }
+      ]
+    }
+  ]
+}

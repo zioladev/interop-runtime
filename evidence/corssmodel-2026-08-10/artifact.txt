@@ -1,0 +1,20 @@
+Trajectory: order-then-pastry/3c-live
+
+anthropic-claude (claude-haiku-4-5-20251001)
+  Path: cafe/commit:place_order -> bakery/commit:add_pastry
+  Terminal: attained
+  Conformant: PASS
+
+openai-gpt (gpt-4o-mini)
+  Path: cafe/commit:place_order -> bakery/commit:add_pastry
+  Terminal: attained
+  Conformant: PASS
+
+google-gemini (gemini-2.5-pro)
+  Path: cafe/commit:place_order -> bakery/commit:add_pastry
+  Terminal: attained
+  Conformant: PASS
+
+Provider: PASS
+Cross-model: path difference: no · terminal difference: no · conformance difference: no
+Convergence: all models reached the allowable terminal state and conformed.

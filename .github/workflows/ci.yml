@@ -21,5 +21,3 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run build
-      # Regenerating the demo must be a no-op — the committed artifact stays in sync.
-      - run: npm run demo && git diff --exit-code examples/

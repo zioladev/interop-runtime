@@ -17,6 +17,7 @@ import { ReferenceRuntime, REFERENCE_RUNTIME_ID } from './reference-runtime.ts';
 import type { WebMcpRuntime } from './reference-runtime.ts';
 import { discover, execute } from './bridge.ts';
 import { validateInput, validateProvider } from './normalize.ts';
+import { gateStateChanging, type ExecutionControlConfig, type ExecutionControlDisposition } from './execution-control.ts';
 
 export { REFERENCE_RUNTIME_ID };
 
@@ -104,6 +105,12 @@ export interface ObservationContext {
   discovery: StepResults['discovery'];
   /** How the adapter formatted the surface (default: a trivial, faithful format). */
   adapterFormat?: StepResults['adapterFormat'];
+  /**
+   * Optional execution-control seam (Phase V). When present with `mode: 'required'`, a state-changing
+   * decision must receive `allow` before the common bridge may call the provider. `candidateProvider`
+   * is the opaque provider identity placed on the forwarded candidate. Reads and `off` mode bypass it.
+   */
+  executionControl?: { config: ExecutionControlConfig; candidateProvider: string };
 }
 
 /**
@@ -151,6 +158,30 @@ export async function observeDecisionOnRuntime(
     };
   }
 
+  // 4b. Execution-control seam (Phase V). For a state-changing decision in `required` mode, the
+  // candidate must receive `allow` before the common bridge may call the provider. A non-allow /
+  // missing / erroring authority stops the step HERE — the provider is never called (fail closed).
+  // Reads and `off` mode never reach this gate, so the authority's evaluate() is never invoked for
+  // them. The candidate is forwarded UNCHANGED; nothing here reads or interprets the arguments.
+  let ecProceed: { evaluated: boolean; disposition?: ExecutionControlDisposition } | undefined;
+  if (ctx.executionControl && ctx.executionControl.config.mode === 'required' && def.effect === 'state-changing') {
+    const gate = await gateStateChanging(ctx.executionControl.config, {
+      provider: ctx.executionControl.candidateProvider,
+      tool: decision.toolName,
+      arguments: decision.arguments,
+      effect: 'state-changing',
+    });
+    if (gate.stopped) {
+      return {
+        ...base,
+        bridge: { attempted: false, ok: false, toolName: decision.toolName, arguments: decision.arguments },
+        argsValidation: { checked: true, ok: true, missingOrInvalidFields: [] },
+        executionControl: { evaluated: gate.evaluated, ...(gate.disposition ? { disposition: gate.disposition } : {}), stopped: true, providerReached: false, ...(gate.unavailable ? { unavailable: true } : {}) },
+      };
+    }
+    ecProceed = { evaluated: gate.evaluated, ...(gate.disposition ? { disposition: gate.disposition } : {}) };
+  }
+
   // 5. Execute through the common bridge and collect evidence.
   const outcome = await execute(runtime, decision.toolName, decision.arguments);
   if (!outcome.ok) {
@@ -158,6 +189,7 @@ export async function observeDecisionOnRuntime(
       ...base,
       bridge: { attempted: true, ok: false, toolName: decision.toolName, arguments: decision.arguments, ...(outcome.error ? { error: outcome.error } : {}) },
       argsValidation: { checked: true, ok: true, missingOrInvalidFields: [] },
+      ...(ecProceed ? { executionControl: { ...ecProceed, stopped: false, providerReached: false } } : {}),
     };
   }
 
@@ -169,6 +201,7 @@ export async function observeDecisionOnRuntime(
     argsValidation: { checked: true, ok: true, missingOrInvalidFields: [] },
     providerExec: { reached: true, ok: true, firedTool: decision.toolName, firedEffect: def.effect },
     evidence: { checked: true, ok: ev.ok, executionResult: result, violations: ev.violations },
+    ...(ecProceed ? { executionControl: { ...ecProceed, stopped: false, providerReached: true } } : {}),
   };
 }
 

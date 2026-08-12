@@ -46,6 +46,12 @@ import { evaluatePath } from './engine.ts';
 import { observeDecisionOnRuntime } from './run-case.ts';
 import { discover } from './bridge.ts';
 import { validateProvider } from './normalize.ts';
+import type { ExecutionControlConfig } from './execution-control.ts';
+
+/** Options for a multi-provider run. `executionControl` enables the optional Phase V seam. */
+export interface RunMultiProviderOptions {
+  executionControl?: ExecutionControlConfig;
+}
 import { ReferenceRuntime } from './reference-runtime.ts';
 import type { WebMcpRuntime } from './reference-runtime.ts';
 import type { ProviderUnderTest } from './run-case.ts';
@@ -201,6 +207,7 @@ export async function runMultiProviderTrajectory(
   resolver: SurfaceResolver,
   spec: MultiProviderTrajectorySpec,
   adapter: ModelConsumerAdapter,
+  opts: RunMultiProviderOptions = {},
 ): Promise<MultiProviderTrajectoryObservation> {
   const identity = { adapterId: adapter.id, adapterVersion: adapter.version, modelId: adapter.modelId };
   const carried: CarriedValue[] = [];
@@ -256,8 +263,13 @@ export async function runMultiProviderTrajectory(
       continue;
     }
 
-    // 4. Observe the decision against THIS provider's surface (same bridge as Phase II).
-    const steps = await observeDecisionOnRuntime(resolved.runtime, resolved.defs, decision, { definition, discovery });
+    // 4. Observe the decision against THIS provider's surface (same bridge as Phase II). When the
+    // optional execution-control seam is configured, the candidate carries this step's provider id.
+    const steps = await observeDecisionOnRuntime(resolved.runtime, resolved.defs, decision, {
+      definition,
+      discovery,
+      ...(opts.executionControl ? { executionControl: { config: opts.executionControl, candidateProvider: step.provider.id } } : {}),
+    });
     const derived = evaluatePath({ ...identity, steps }, task, undefined);
     const firedTool = steps.providerExec.firedTool;
     const firedEffect = steps.providerExec.firedEffect;
@@ -505,8 +517,9 @@ export async function runMultiProviderTrajectoryOnReference(
   providers: Record<string, ProviderUnderTest>,
   spec: MultiProviderTrajectorySpec,
   adapter: ModelConsumerAdapter,
+  opts: RunMultiProviderOptions = {},
 ): Promise<MultiProviderTrajectoryObservation> {
-  return runMultiProviderTrajectory(makeReferenceSurfaceResolver(providers), spec, adapter);
+  return runMultiProviderTrajectory(makeReferenceSurfaceResolver(providers), spec, adapter, opts);
 }
 
 export interface MultiProviderTrajectoryCase {

@@ -7,4 +7,4 @@
 // provenance below records which package actually produced the report.
 export const TRAJECTORY_REPORT_VERSION = 'provider-conformance-report/2';
 export const REPORT_GENERATOR = '@zioladev/interop-runtime';
-export const REPORT_GENERATOR_VERSION = '0.1.0';
+export const REPORT_GENERATOR_VERSION = '0.1.1';

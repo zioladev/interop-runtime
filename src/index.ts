@@ -115,6 +115,19 @@ export type { CrossModelTrajectoryResult, CrossModelPerModel, CrossModelComparis
 export { CHROME_WEBMCP_RUNTIME_ID, makeBrowserSurfaceResolver } from './browser-host.ts';
 export type { BrowserHost } from './browser-host.ts';
 
+// --- The OPTIONAL execution-control seam (Phase V): consult an opaque authority before a consequential
+// execution reaches a provider. Structurally compatible with @zioladev/execution-control; no dependency. ---
+export { gateStateChanging } from './execution-control.ts';
+export type {
+  ExecutionControlDisposition,
+  ExecutionCandidate,
+  ExecutionControlProvider,
+  ExecutionControlMode,
+  ExecutionControlConfig,
+  ExecutionControlObservation,
+} from './execution-control.ts';
+export type { RunMultiProviderOptions } from './trajectory-multi.ts';
+
 // --- The FROZEN 3C acceptance fixture (shipped canonical) — the exact spec + provider defs every
 // gate (reference, cross-model live, Chrome/WebMCP) drives byte-identically. See acceptance-fixture.ts. ---
 export {

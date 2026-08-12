@@ -1,6 +1,6 @@
 # @zioladev/interop-runtime
 
-**Run stateful multi-provider WebMCP journeys.**
+**Run stateful objectives across independent WebMCP providers.**
 
 `@zioladev/interop-runtime` is a model-agnostic runtime for executing **ordered, multi-step
 trajectories** across independent provider surfaces. It carries authoritative outputs from one step
@@ -92,6 +92,34 @@ Architectural guarantees the runtime holds, by construction:
   clean decline of a required commit lands on the model — never on the provider.
 - **A different valid path is not a failure.** Two adapters taking different valid routes to the same
   allowable terminal state, with state preserved and invariants satisfied, both conform.
+
+## Optional execution control (before the provider call)
+
+The runtime can consult an external, **opaque** execution-control authority before a **state-changing**
+execution reaches a provider — structurally compatible with
+[`@zioladev/execution-control`](https://github.com/zioladev/execution-control), with **no** hard
+dependency (the port is re-declared here).
+
+```ts
+const observation = await runMultiProviderTrajectory(resolver, spec, adapter, {
+  executionControl: { mode: 'required', provider: myAuthority }, // myAuthority.evaluate(candidate) → 'allow' | 'block' | 'indeterminate'
+});
+```
+
+- **`mode: 'off'`** — existing behavior; no evaluation, no control claim.
+- **`mode: 'required'`** — every state-changing decision must receive `allow` before the common bridge
+  may call the provider tool. `allow` proceeds; `block` / `indeterminate` / missing-provider / throw /
+  timeout all mean **the provider is never called** (fail closed). Non-state-changing tools bypass the
+  seam entirely.
+
+The runtime builds the candidate from what it already holds and forwards it **unchanged** — it never
+derives, interprets, or inspects the disposition or the arguments. A stopped step is recorded as
+`stopped_by_execution_control` in a `StepResults.executionControl` observation kept **distinct** from
+the provider `ExecutionResult`, and it is **not a fault**: the provider grade is untouched (the provider
+was never called), and whether the objective is attained is left to the terminal semantics. In one
+property: a prompt-injected or over-agentic model can select the tool and build valid arguments — and
+still lack authority to cross the provider boundary. **Model decision, provider conformance, and
+trajectory qualification each ≠ execution permission; only an `allow` grants it.**
 
 ## Evidence & interoperability analysis
 

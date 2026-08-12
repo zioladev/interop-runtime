@@ -4,6 +4,8 @@
 // consumer path) into a versioned, attributable, machine-readable observation.
 // See docs/provider-conformance/ for the full specification.
 
+import type { ExecutionControlObservation } from './execution-control.ts';
+
 /** A provider tool's declared effect. */
 export type Effect = 'read' | 'state-changing';
 
@@ -141,6 +143,7 @@ export interface ModelConsumerAdapter {
 /** The ten first-class outcomes (§04). Closed per report version. */
 export type Outcome =
   | 'executed'
+  | 'stopped_by_execution_control'
   | 'blocked_by_provider_contract'
   | 'clarification'
   | 'no_tool_selected'
@@ -222,6 +225,8 @@ export interface StepResults {
   argsValidation: { checked: boolean; ok: boolean; missingOrInvalidFields: string[] };
   /** The ExecutionResult contract check. */
   evidence: { checked: boolean; ok: boolean; executionResult?: ExecutionResult; violations: string[] };
+  /** Optional execution-control observation (Phase V) — distinct from the provider ExecutionResult. */
+  executionControl?: ExecutionControlObservation;
   /** Optional segmented timing. */
   timing?: { model?: number; bridge?: number; provider?: number; total?: number };
 }

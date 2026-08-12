@@ -56,6 +56,8 @@ function dispositionOf(outcome: Outcome, firedEffect: Effect | undefined): Actio
     case 'clarification':
     case 'no_tool_selected':
     case 'blocked_by_provider_contract':
+    case 'stopped_by_execution_control':
+      // Stopped at the execution-control boundary before the provider — deferred, never failed.
       return 'deferred';
     default:
       return 'failed';
@@ -192,6 +194,18 @@ export function evaluatePath(
     return done('no_tool_selected');
   }
   cv.model_tool_selection = 'PASS';
+
+  // 5b. Execution-control seam (Phase V). A required-mode disposition other than `allow` (or a
+  // missing/erroring authority) stops the step BEFORE the common bridge. This is a boundary
+  // observation, NOT a fault: the provider was never called, so no provider/model/orchestration
+  // category is charged and providerNonconformance is untouched. Whether the objective is ultimately
+  // attained is left to the trajectory's terminal semantics (a blocked required commit simply does
+  // not commit). Placed after model_tool_selection PASS so a valid, well-selected tool_call that the
+  // boundary stops is recorded as stopped — never mislabeled a bridge/provider failure.
+  if (s.executionControl?.stopped) {
+    cv.provider_execution = 'NOT_REACHED';
+    return done('stopped_by_execution_control');
+  }
 
   // 6. Common execution bridge.
   if (!s.bridge.attempted) {
